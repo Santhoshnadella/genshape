@@ -70,3 +70,67 @@ We specifically thank them for the **PicoGK** engine which powers our voxels, an
 
 ---
 *Built with ❤️ by the GenShape Team*
+
+## 🖼️ Project Gallery
+
+Here are some snapshots of the system in action, demonstrating the generation of Fusors, Habitats, and intricate Rover Wheels.
+
+<div align="center">
+
+| **Fusor Generation** | **Habitat Concept** |
+| :---: | :---: |
+| ![Fusor](fusor_simulation.jpg) | ![Habitat](habitat_structure.jpg) |
+| *Simulating a Farnsworth Fusor Grid* | *Deployable Inflatable Habitat Structure* |
+
+| **Rover Wheel (Iso)** | **Rover Wheel (Front)** |
+| :---: | :---: |
+| ![Wheel Iso](rover_wheel_iso.jpg) | ![Wheel Front](rover_wheel_front.jpg) |
+| *Procedurally Generated Lattice Wheel* | *Optimized Traction Surface Pattern* |
+
+</div>
+
+## 🔧 Technical Deep Dive: Inside the Engine
+
+The power of GenShape lies in its stack: **PicoGK** for geometry and **ShapeKernel** for logic. Here is how they work together to create Physical AI.
+
+### 1. PicoGK: The Voxel Field Geometry Kernel
+Traditional CAD uses Boundary Representations (B-Rep), defining objects by their mathematically perfect surfaces. This is often fragile and fails with complex operations (like combining 10,000 struts).
+
+**PicoGK** is different. It uses **Voxels** (Volumetric Pixels).
+-   **The Field**: Imagine space as a dense grid. Every point has a value representing its distance to the nearest surface (Signed Distance Field).
+-   **Indestructible Boolean Logic**: Adding two objects is just `max(A, B)`. Subtracting is `A - B`. It **never** fails, no matter how complex the geometry.
+-   **Micro-Architecture**: This allows us to generate foam-like lattices, gyroids, and organic shapes that are impossible in standard CAD.
+
+### 2. LEAP71 ShapeKernel: The Logic Framework
+**ShapeKernel** is the "brain" that sits on top of PicoGK. It turns raw voxels into Engineering Objects.
+-   **Parametric DNA**: A part isn't a static file. It is a live `Class`. A `RoverWheel` is a class with properties like `Radius`, `SpokeThickness`, and `PatternType`.
+-   **Recursive Composition**: Shapes can contain other Shapes. A `Wheel` contains a `Hub`, `Struts`, and `Tread`, all seamlessly combined.
+
+### ⚙️ Logic Flow Diagram
+
+The following diagram illustrates how a user request transforms into a physical file:
+
+```mermaid
+graph TD
+    A[User Request: 'Design a Rover Wheel'] -->|Natural Language| B(GenShape IA Agent);
+    B -->|Extract Constraints| C{parameters};
+    C -->|Radius, Load, Terrain| D[ShapeKernel Class: RoverWheel];
+    
+    subgraph "Computational Geometry Pipeline"
+        D -->|Construct Hub| E[Voxel Field: Hub];
+        D -->|Construct Lattices| F[Voxel Field: Struts];
+        D -->|Construct Tread| G[Voxel Field: Traction];
+        
+        E & F & G -->|Boolean Union (+)| H[Combined Voxel Model];
+    end
+    
+    H -->|Slice / Mesh| I[PicoGK Processor];
+    I -->|Export| J[Output: STL / CLI / VDB];
+```
+
+### Why This Matters?
+By moving from **Drawing Lines** to **Writing Code**, we can:
+1.  **Automate Complexity**: Generate unique parts for every single vehicle without human effort.
+2.  **Embed Engineering**: The code technically prevents valid geometry from effectively violating physics (e.g. by ensuring minimum wall thicknesses automatically).
+3.  **Optimize instantly**: Change one line of code to make the wheel 10% lighter, and the entire geometry rebuilds instantly.
+
