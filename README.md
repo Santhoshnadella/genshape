@@ -6,7 +6,7 @@
 
 RoverRunner is a cutting-edge **Introduction to Computational Engineering** agent designed to assist automotive engineers in designing, analyzing, and optimizing vehicle components. It represents a paradigm shift from manual CAD drafting to algorithmic, rules-driven engineering. By leveraging advanced geometry kernels, it can procedurally generate unique, performance-driven geometries like monocoque chassis and optimized rover wheels.
 
-![CLI Interface](cli_interface_concept.png)
+
 
 ## 📊 Project Status
 
