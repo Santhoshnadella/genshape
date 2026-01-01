@@ -1,0 +1,5 @@
+K:\compusahpe\one1.0\RoverRunner\obj\Debug\net10.0\RoverRunner.csproj.AssemblyReference.cache
+K:\compusahpe\one1.0\RoverRunner\obj\Debug\net10.0\RoverRunner.GeneratedMSBuildEditorConfig.editorconfig
+K:\compusahpe\one1.0\RoverRunner\obj\Debug\net10.0\RoverRunner.AssemblyInfoInputs.cache
+K:\compusahpe\one1.0\RoverRunner\obj\Debug\net10.0\RoverRunner.AssemblyInfo.cs
+K:\compusahpe\one1.0\RoverRunner\obj\Debug\net10.0\RoverRunner.csproj.CoreCompileInputs.cache
