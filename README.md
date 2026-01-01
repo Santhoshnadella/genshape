@@ -106,27 +106,7 @@ Traditional CAD uses Boundary Representations (B-Rep), defining objects by their
 -   **Parametric DNA**: A part isn't a static file. It is a live `Class`. A `RoverWheel` is a class with properties like `Radius`, `SpokeThickness`, and `PatternType`.
 -   **Recursive Composition**: Shapes can contain other Shapes. A `Wheel` contains a `Hub`, `Struts`, and `Tread`, all seamlessly combined.
 
-### ⚙️ Logic Flow Diagram
 
-The following diagram illustrates how a user request transforms into a physical file:
-
-```mermaid
-graph TD
-    A[User Request: 'Design a Rover Wheel'] -->|Natural Language| B(GenShape IA Agent);
-    B -->|Extract Constraints| C{parameters};
-    C -->|Radius, Load, Terrain| D[ShapeKernel Class: RoverWheel];
-    
-    subgraph "Computational Geometry Pipeline"
-        D -->|Construct Hub| E[Voxel Field: Hub];
-        D -->|Construct Lattices| F[Voxel Field: Struts];
-        D -->|Construct Tread| G[Voxel Field: Traction];
-        
-        E & F & G -->|Boolean Union (+)| H[Combined Voxel Model];
-    end
-    
-    H -->|Slice / Mesh| I[PicoGK Processor];
-    I -->|Export| J[Output: STL / CLI / VDB];
-```
 
 ### Why This Matters?
 By moving from **Drawing Lines** to **Writing Code**, we can:
