@@ -1,10 +1,10 @@
-# RoverRunner: Automotive Intelligent Engineering 'Antigravity' Agent
+# GenShape: Automotive Intelligent Engineering
 
 ![Concept Art](rover_concept_art.png)
 
 ## 🚀 Project Overview
 
-RoverRunner is a cutting-edge **Introduction to Computational Engineering** agent designed to assist automotive engineers in designing, analyzing, and optimizing vehicle components. It represents a paradigm shift from manual CAD drafting to algorithmic, rules-driven engineering. By leveraging advanced geometry kernels, it can procedurally generate unique, performance-driven geometries like monocoque chassis and optimized rover wheels.
+GenShape is a cutting-edge **Introduction to Computational Engineering** agent designed to assist automotive engineers in designing, analyzing, and optimizing vehicle components. It represents a paradigm shift from manual CAD drafting to algorithmic, rules-driven engineering. By leveraging advanced geometry kernels, it can procedurally generate unique, performance-driven geometries like monocoque chassis and optimized rover wheels.
 
 
 
@@ -26,7 +26,7 @@ RoverRunner is a cutting-edge **Introduction to Computational Engineering** agen
 
 ## 🛠️ How It Works
 
-The **Antigravity Agent** functions as a pair-programmer for physical objects:
+The **GenShape System** functions as a pair-programmer for physical objects:
 
 1.  **Conversational Interface**: The user interacts with the agent via a natural language Command Line Interface (CLI). The agent maintains context of the conversation (`IntelligentAgent.cs`).
 2.  **Requirements Gathering**: Through a structured dialogue, the agent gathers critical constraints:
@@ -69,4 +69,4 @@ We specifically thank them for the **PicoGK** engine which powers our voxels, an
 4.  **Interact**: Follow the on-screen prompts to design your automotive component.
 
 ---
-*Built with ❤️ by the Antigravity Team*
+*Built with ❤️ by the GenShape Team*
