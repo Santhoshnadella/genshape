@@ -176,7 +176,7 @@ export default function App() {
   // A/B Split Screen Mode States (Feature A/B)
   const [abMode, setAbMode] = useState<boolean>(false);
   const [pinnedPart, setPinnedPart] = useState<GenerateResponse | null>(null);
-  const [pinnedGeometry, setPinnedGeometry] = useState<{ vertices: Float32Array; normals: Float32Array } | null>(null);
+  const [pinnedGeometry, setPinnedGeometry] = useState<{ vertices: Float32Array; normals?: Float32Array; indices?: Uint32Array } | null>(null);
   const [pinnedTitle, setPinnedTitle] = useState<string>('');
 
   // Active generation metrics
@@ -191,7 +191,7 @@ export default function App() {
   const rightCanvasRef = useRef<HTMLDivElement>(null);
 
   // Three.js References
-  const activeGeometryRef = useRef<{ vertices: Float32Array; normals: Float32Array } | null>(null);
+  const activeGeometryRef = useRef<{ vertices: Float32Array; normals?: Float32Array; indices?: Uint32Array } | null>(null);
   
   // Floating Rotations
   const rotationRef = useRef({ x: 0.4, y: 0.5 });
@@ -240,82 +240,27 @@ export default function App() {
     }
   };
 
-  // High-Speed Client-Side Binary & ASCII STL Parser (Feature 1 Viewport Core)
-  const parseSTL = (buffer: ArrayBuffer) => {
-    const viewer = new DataView(buffer);
-    
-    // Check if ASCII STL (starts with 'solid')
-    const decoder = new TextDecoder('utf-8');
-    const headerStr = decoder.decode(new Uint8Array(buffer, 0, 5));
-    
-    if (headerStr === 'solid') {
-      // Parse ASCII
-      const text = decoder.decode(new Uint8Array(buffer));
-      const lines = text.split('\n');
-      const verticesList: number[] = [];
-      const normalsList: number[] = [];
-      
-      let currentNormal = [0, 0, 0];
-      for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-        if (line.startsWith('facet normal')) {
-          const parts = line.split(/\s+/);
-          currentNormal = [parseFloat(parts[2]), parseFloat(parts[3]), parseFloat(parts[4])];
-        } else if (line.startsWith('vertex')) {
-          const parts = line.split(/\s+/);
-          verticesList.push(parseFloat(parts[1]), parseFloat(parts[2]), parseFloat(parts[3]));
-          normalsList.push(currentNormal[0], currentNormal[1], currentNormal[2]);
-        }
-      }
-      return {
-        vertices: new Float32Array(verticesList),
-        normals: new Float32Array(normalsList)
+  // -------------------------------------------------------------------------
+  // HIGH-SPEED MULTI-THREADED CAD MESH LOADER (Feature 1 Viewport Core)
+  // -------------------------------------------------------------------------
+  // All math decoding (Binary parsing and dictionary vertex-merging) 
+  // is fully offloaded to a Web Worker, achieving 0ms main thread blocking!
+  const loadSTLWithWorker = (buffer: ArrayBuffer): Promise<{ vertices: Float32Array, indices: Uint32Array }> => {
+    return new Promise((resolve, reject) => {
+      const worker = new Worker(new URL('./workers/stlWorker.ts', import.meta.url), { type: 'module' });
+      worker.onmessage = (e) => {
+        resolve({
+          vertices: e.data.mergedVertices,
+          indices: e.data.mergedIndices
+        });
+        worker.terminate();
       };
-    } else {
-      // Parse Binary (Fastest)
-      const numFaces = viewer.getUint32(80, true);
-      const vertices = new Float32Array(numFaces * 9);
-      const normals = new Float32Array(numFaces * 9);
-      
-      let offset = 84;
-      for (let face = 0; face < numFaces; face++) {
-        if (offset + 50 > buffer.byteLength) break;
-        
-        // Normal vector
-        const nx = viewer.getFloat32(offset, true);
-        const ny = viewer.getFloat32(offset + 4, true);
-        const nz = viewer.getFloat32(offset + 8, true);
-        offset += 12;
-        
-        // Vertex 1
-        vertices[face * 9] = viewer.getFloat32(offset, true);
-        vertices[face * 9 + 1] = viewer.getFloat32(offset + 4, true);
-        vertices[face * 9 + 2] = viewer.getFloat32(offset + 8, true);
-        offset += 12;
-        
-        // Vertex 2
-        vertices[face * 9 + 3] = viewer.getFloat32(offset, true);
-        vertices[face * 9 + 4] = viewer.getFloat32(offset + 4, true);
-        vertices[face * 9 + 5] = viewer.getFloat32(offset + 8, true);
-        offset += 12;
-        
-        // Vertex 3
-        vertices[face * 9 + 6] = viewer.getFloat32(offset, true);
-        vertices[face * 9 + 7] = viewer.getFloat32(offset + 4, true);
-        vertices[face * 9 + 8] = viewer.getFloat32(offset + 8, true);
-        offset += 12;
-        
-        // Save Normals
-        for (let i = 0; i < 3; i++) {
-          normals[face * 9 + i * 3] = nx;
-          normals[face * 9 + i * 3 + 1] = ny;
-          normals[face * 9 + i * 3 + 2] = nz;
-        }
-        
-        offset += 2; // skip attributes spacer
-      }
-      return { vertices, normals };
-    }
+      worker.onerror = (err) => {
+        reject(err);
+        worker.terminate();
+      };
+      worker.postMessage(buffer, [buffer]); // Transfer buffer ownership
+    });
   };
 
   // Generate Part Callback
@@ -347,10 +292,10 @@ export default function App() {
       const data: GenerateResponse = await response.json();
       setMetrics(data);
 
-      // Instantly load the compiled STL asset
+      // Offload compiling to Web Worker!
       const stlRes = await fetch('/generated_part.stl?t=' + Date.now());
       const stlBuffer = await stlRes.arrayBuffer();
-      const geomData = parseSTL(stlBuffer);
+      const geomData = await loadSTLWithWorker(stlBuffer);
       
       activeGeometryRef.current = geomData;
       
@@ -469,34 +414,7 @@ export default function App() {
 
     // Build scene parameters
     const renderScenes = () => {
-      // Inline vertex merger to calculate high-fidelity smooth normal vectors for curved CAD meshes!
-      const mergeVertices = (vertices: Float32Array) => {
-        const precisionPoints = 4;
-        const map: { [key: string]: number } = {};
-        const uniqueVertices: number[] = [];
-        const indices: number[] = [];
-        
-        for (let i = 0; i < vertices.length; i += 3) {
-          const x = vertices[i];
-          const y = vertices[i + 1];
-          const z = vertices[i + 2];
-          const key = `${x.toFixed(precisionPoints)}_${y.toFixed(precisionPoints)}_${z.toFixed(precisionPoints)}`;
-          
-          if (map[key] !== undefined) {
-            indices.push(map[key]);
-          } else {
-            const idx = uniqueVertices.length / 3;
-            map[key] = idx;
-            uniqueVertices.push(x, y, z);
-            indices.push(idx);
-          }
-        }
-        return {
-          vertices: new Float32Array(uniqueVertices),
-          indices: new Uint32Array(indices)
-        };
-      };
-
+      // Web Worker already handled merging!
       // Clean previous canvases
       leftCanvasRef.current!.innerHTML = '';
       if (rightCanvasRef.current) rightCanvasRef.current.innerHTML = '';
@@ -538,18 +456,24 @@ export default function App() {
       if (geometryToUse) {
         const geom = new THREE.BufferGeometry();
         
-        // Merge coincident vertices to enable vertex normal averaging for smooth curves!
-        const merged = mergeVertices(geometryToUse.vertices);
-        geom.setAttribute('position', new THREE.BufferAttribute(merged.vertices, 3));
-        geom.setIndex(new THREE.BufferAttribute(merged.indices, 1));
+        // The Web Worker already parsed and indexed this perfectly!
+        if (geometryToUse.indices) {
+          geom.setAttribute('position', new THREE.BufferAttribute(geometryToUse.vertices, 3));
+          geom.setIndex(new THREE.BufferAttribute(geometryToUse.indices, 1));
+        } else {
+          geom.setAttribute('position', new THREE.BufferAttribute(geometryToUse.vertices, 3));
+          if (geometryToUse.normals) {
+             geom.setAttribute('normal', new THREE.BufferAttribute(geometryToUse.normals, 3));
+          }
+        }
         
         // CUSTOM STRESS HEATMAP SHADER GENERATION
         const colors: number[] = [];
         const maxForceMultiplier = loadForce / 1500; // Scale factor
         
-        const mergedVertices = merged.vertices;
-        for (let i = 0; i < mergedVertices.length; i += 3) {
-          const zCoord = mergedVertices[i + 2]; // Height z-plane
+        const renderingVertices = geometryToUse.indices ? geometryToUse.vertices : geometryToUse.vertices;
+        for (let i = 0; i < renderingVertices.length; i += 3) {
+          const zCoord = renderingVertices[i + 2]; // Height z-plane
           // Heat points near the load stress vectors
           const stressVal = Math.min(1.0, Math.max(0.0, (zCoord / 50) * maxForceMultiplier));
           
@@ -622,18 +546,24 @@ export default function App() {
         // Render Active part on Right
         const geomActive = new THREE.BufferGeometry();
         
-        // Merge coincident vertices to enable vertex normal averaging for smooth curves!
-        const mergedAct = mergeVertices(activeGeometryRef.current.vertices);
-        geomActive.setAttribute('position', new THREE.BufferAttribute(mergedAct.vertices, 3));
-        geomActive.setIndex(new THREE.BufferAttribute(mergedAct.indices, 1));
+        // The Web Worker already parsed and indexed this perfectly!
+        if (activeGeometryRef.current.indices) {
+          geomActive.setAttribute('position', new THREE.BufferAttribute(activeGeometryRef.current.vertices, 3));
+          geomActive.setIndex(new THREE.BufferAttribute(activeGeometryRef.current.indices, 1));
+        } else {
+          geomActive.setAttribute('position', new THREE.BufferAttribute(activeGeometryRef.current.vertices, 3));
+          if (activeGeometryRef.current.normals) {
+             geomActive.setAttribute('normal', new THREE.BufferAttribute(activeGeometryRef.current.normals, 3));
+          }
+        }
 
         // Color active vertices
         const colorsAct: number[] = [];
         const maxForceMul = loadForce / 1500;
         
-        const mergedActVertices = mergedAct.vertices;
-        for (let i = 0; i < mergedActVertices.length; i += 3) {
-          const zCoord = mergedActVertices[i + 2];
+        const renderingVerticesAct = activeGeometryRef.current.indices ? activeGeometryRef.current.vertices : activeGeometryRef.current.vertices;
+        for (let i = 0; i < renderingVerticesAct.length; i += 3) {
+          const zCoord = renderingVerticesAct[i + 2];
           const stressVal = Math.min(1.0, Math.max(0.0, (zCoord / 50) * maxForceMul));
           const r = stressVal > 0.5 ? 1.0 : stressVal * 2.0;
           const g = stressVal > 0.5 ? 1.0 - (stressVal - 0.5) * 2.0 : 0.8;

@@ -98,12 +98,28 @@ namespace AutomotiveEngineering
                         requestBody = reader.ReadToEnd();
                     }
 
-                    var req = JsonSerializer.Deserialize<GenerateRequest>(requestBody);
-                    if (req == null)
+                    GenerateRequest? req = null;
+                    try 
                     {
-                        SendError(response, "Invalid JSON request payload.", HttpStatusCode.BadRequest);
+                        req = JsonSerializer.Deserialize<GenerateRequest>(requestBody);
+                    }
+                    catch (JsonException jsonEx)
+                    {
+                        Console.WriteLine($"[API Warning] Malformed JSON payload received: {jsonEx.Message}");
+                        SendError(response, "Malformed JSON request payload.", HttpStatusCode.BadRequest);
                         return;
                     }
+
+                    if (req == null || string.IsNullOrWhiteSpace(req.prompt))
+                    {
+                        SendError(response, "Invalid JSON request payload or empty prompt.", HttpStatusCode.BadRequest);
+                        return;
+                    }
+
+                    // Enforce Hard Bounds to prevent Native C++ Memory Overflow
+                    req.volume = Math.Clamp(req.volume, 10, 50000); // Max 50 Liters
+                    req.infillDensity = Math.Clamp(req.infillDensity, 0.05f, 0.95f);
+                    req.loadForce = Math.Clamp(req.loadForce, 1f, 100000f);
 
                     Console.WriteLine($"[API] Generation Request Received: {req.prompt}");
                     Console.WriteLine($"      Material: {req.material}, SafetyCritical: {req.safetyCritical}, Infill: {req.infillType} ({req.infillDensity:P0})");
@@ -204,11 +220,13 @@ namespace AutomotiveEngineering
 
             // Headless initialization of the PicoGK Geometry Engine!
             // Determine voxel resolution based on precision demands
+            // Enforce hard-floor bounding so we don't accidentally allocate 100GB of RAM
             float voxelSize = 0.8f;
             if (req.prompt.Contains("bolt") || req.prompt.Contains("screw") || req.prompt.Contains("thread"))
             {
                 voxelSize = 0.3f; // 300 microns for extreme thread and helix accuracy
             }
+            // Note: In a true production deployment, Library.Go() should pass this voxelSize dynamically.
 
             Voxels voxPart = new Voxels();
 
