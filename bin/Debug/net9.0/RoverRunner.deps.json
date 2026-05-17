@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "RoverRunner/1.0.0": {
+        "dependencies": {
+          "PicoGK": "1.7.7.5"
+        },
+        "runtime": {
+          "RoverRunner.dll": {}
+        }
+      },
+      "PicoGK/1.7.7.5": {
+        "runtime": {
+          "PicoGK.dll": {
+            "assemblyVersion": "1.7.7.5",
+            "fileVersion": "1.7.7.5"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "RoverRunner/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "PicoGK/1.7.7.5": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

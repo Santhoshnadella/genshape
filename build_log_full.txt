@@ -1,0 +1,28 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+  PicoGK -> K:\compusahpe\one1.0\PicoGK\bin\Debug\net9.0\PicoGK.dll
+K:\compusahpe\one1.0\LEAP71_ShapeKernel\ShapeKernel\BaseShapes\BaseRevolve.cs(297,91): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context. [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\LEAP71_ShapeKernel\ShapeKernel\Utilities\UsefulFormulas.cs(46,38): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context. [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\RoverRunner\AutomotiveEngineeringLayer.cs(113,13): error CS0246: The type or namespace name 'Vector3' could not be found (are you missing a using directive or an assembly reference?) [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\RoverRunner\AutomotiveEngineeringLayer.cs(113,21): warning CS0168: The variable 'minHash' is declared but never used [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\RoverRunner\AutomotiveEngineeringLayer.cs(113,30): warning CS0168: The variable 'maxHash' is declared but never used [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\RoverRunner\IntelligentAgent.cs(257,21): error CS0234: The type or namespace name 'Sh' does not exist in the namespace 'PicoGK' (are you missing an assembly reference?) [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\RoverRunner\IntelligentAgent.cs(257,58): error CS0234: The type or namespace name 'Sh' does not exist in the namespace 'PicoGK' (are you missing an assembly reference?) [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\RoverRunner\IntelligentAgent.cs(257,85): error CS0234: The type or namespace name 'Sh' does not exist in the namespace 'PicoGK' (are you missing an assembly reference?) [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\LEAP71_RoverWheel\RoverWheel\WheelElements\RectHoles.cs(142,17): warning CS0162: Unreachable code detected [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+
+Build FAILED.
+
+K:\compusahpe\one1.0\LEAP71_ShapeKernel\ShapeKernel\BaseShapes\BaseRevolve.cs(297,91): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context. [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\LEAP71_ShapeKernel\ShapeKernel\Utilities\UsefulFormulas.cs(46,38): warning CS8632: The annotation for nullable reference types should only be used in code within a '#nullable' annotations context. [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\RoverRunner\AutomotiveEngineeringLayer.cs(113,21): warning CS0168: The variable 'minHash' is declared but never used [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\RoverRunner\AutomotiveEngineeringLayer.cs(113,30): warning CS0168: The variable 'maxHash' is declared but never used [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\LEAP71_RoverWheel\RoverWheel\WheelElements\RectHoles.cs(142,17): warning CS0162: Unreachable code detected [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\RoverRunner\AutomotiveEngineeringLayer.cs(113,13): error CS0246: The type or namespace name 'Vector3' could not be found (are you missing a using directive or an assembly reference?) [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\RoverRunner\IntelligentAgent.cs(257,21): error CS0234: The type or namespace name 'Sh' does not exist in the namespace 'PicoGK' (are you missing an assembly reference?) [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\RoverRunner\IntelligentAgent.cs(257,58): error CS0234: The type or namespace name 'Sh' does not exist in the namespace 'PicoGK' (are you missing an assembly reference?) [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+K:\compusahpe\one1.0\RoverRunner\IntelligentAgent.cs(257,85): error CS0234: The type or namespace name 'Sh' does not exist in the namespace 'PicoGK' (are you missing an assembly reference?) [K:\compusahpe\one1.0\RoverRunner\RoverRunner.csproj]
+    5 Warning(s)
+    4 Error(s)
+
+Time Elapsed 00:00:02.29
