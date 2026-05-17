@@ -1,0 +1,21 @@
+node_modules/
+dist/
+build/
+.env
+
+# .NET Core
+bin/
+obj/
+TestResults/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+*.DS_Store
+*.log
+
+# Generated artifacts
+*.stl
+*.obj
+*.vdb
